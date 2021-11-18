@@ -16,7 +16,6 @@ const HTTP_PORT = 5000;
 
 // Start server
 app.listen(HTTP_PORT, () => {
-	console.log("Server running on port %PORT%".replace("%PORT%", HTTP_PORT))
 });
 // READ (HTTP method GET) at root endpoint /app/
 app.get("/app/", (req, res, next) => {
@@ -26,10 +25,11 @@ app.get("/app/", (req, res, next) => {
 
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
-app.post("/app/new/", function (req, res) {
+app.post("/app/new/", (req, res) => {
+	const count = db.prepare("SELECT COUNT(*) count FROM userinfo").get().count + 1;
 	const stmt = db.prepare("INSERT INTO userinfo (user, pass) VALUES (?, ?)");
 	const insert = stmt.run(req.body.user, md5(req.body.pass));
-	res.status(201).json({ "message": `1 record created: ID ${req.params.id} (201)` });
+	res.status(201).json({ "message": `1 record created: ID ${count} (201)` });
 })
 
 // READ a list of all users (HTTP method GET) at endpoint /app/users/
