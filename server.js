@@ -28,8 +28,8 @@ app.get("/app/", (req, res, next) => {
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new/user", function (req, res) {
 	const stmt = db.prepare("INSERT INTO userinfo (user, pass) VALUES (?, ?)");
-	const insert = stmt.run("Yang", md5("1234"));
-	res.status(200).json({ "message": "User successfully added to database" });
+	const insert = stmt.run(req.body.user, md5(req.body.pass));
+	res.status(201).json({ "message": `1 record created: ID ${req.params.id} (201)` });
 })
 
 // READ a list of all users (HTTP method GET) at endpoint /app/users/
@@ -47,16 +47,14 @@ app.get("/app/users/:id", (req, res) => {
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	const user = "Yang";
-	const pass = "4567";
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?").run(user, md5(pass), req.params.id);
-	res.status(200).json({ "message": `User ${req.params.id} successfully updated` });
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?").run(req.body.user, md5(req.body.pass), req.params.id);
+	res.status(200).json({ "message": `1 record updated: ID ${req.params.id} (200)` });
 });
 
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id", (req, res) => {
 	const stmt = db.prepare("DELETE FROM userinfo WHERE id = ?").run(req.params.id);
-	res.status(200).json({ "message": `User ${req.params.id} successfully deleted` });
+	res.status(200).json({ "message": `1 record deleted: ID ${req.params.id} (200)` });
 
 });
 
